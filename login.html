@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="toast.css" />
+  </head>
+
+  <body>
+    <div id="box">
+    <img src="Resources\logo\aph_logo@033x.png" id="logo" height="100px"></img></br>
+    <title>Login</title>
+    <label><b>Server</b></label>
+    <input id="server" type="text" value="odoodev.sulaimanhabsi.com" required /><br />
+    <label><b>Username</b></label>
+    <input id="username" type="text" required /><br />
+    <label><b>Password</b></label>
+    <input id="pwd" type="password" required /><br />
+    <button type="button" onclick="fusionLoginToOdoo()">Login</button>
+
+    <br />
+    </div>
+    <div id="snackbar">Invalid Username or Password</div>
+  </body>
+  <script>
+    function fusionLoginToOdoo() {
+      var serv = document.getElementById("server").value;
+      var user = document.getElementById("username").value;
+      var password = document.getElementById("pwd").value;
+      if (serv == "" || user == "" || password == "") {
+        return false;
+      }
+      var args = {
+        cmd: "LOGIN",
+        server: serv,
+        uid: user,
+        pwd: password,
+      };
+      // console.log(args)
+      adsk.fusionSendData("send", JSON.stringify(args));
+    }
+
+    window.fusionJavaScriptHandler = {
+      handle: function (action, data) {
+        try {
+          if (action == "send") {
+            dataObj = JSON.parse(data);
+            if (dataObj.cmd == "LOGIN") {
+              console.log(dataObj);
+              if (dataObj.uid == true) {
+                location.href = "Menu.html";
+              } else {
+                showToast("Invalid username or password");
+              }
+              // console.log(data)
+            } else if (dataObj.cmd == "AUTOLOGIN") {
+              location.href = "Menu.html";
+            }
+          } else if (action == "debugger") {
+            debugger;
+          } else {
+            return "Unexpected command type: " + action;
+          }
+        } catch (e) {
+          console.log(e);
+          console.log(
+            "exception caught with command: " + action + ", data: " + data
+          );
+        }
+        return "OK";
+      },
+    };
+
+    function showToast(msg) {
+      // Get the snackbar DIV
+      var x = document.getElementById("snackbar");
+      x.innerHTML = msg;
+      // Add the "show" class to DIV
+      x.className = "show";
+
+      // After 3 seconds, remove the show class from DIV
+      setTimeout(function () {
+        x.className = x.className.replace("show", "");
+      }, 3000);
+    }
+  </script>
+</html>

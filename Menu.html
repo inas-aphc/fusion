@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="toast.css" />
+  </head>
+
+  <body>
+    <img src="Resources\logo\aph_logo@033x.png" id="logo" height="100px"></img></br></br></br>
+    <div id="buttonbox">
+    <button class="button" type="button" onclick="goToGetPartNumber()">Get Part Number</button
+    ><br />
+    <button class="button"type="button" onclick="goToGetUpdateProperites()">
+      update Part Properties</button>
+      <br />
+    <button class="button"type="button" onclick="goToGenerateBoM()">Generate BOM</button
+    ><br />
+    <button class="button" type="button" onclick="goToAddQuotation()">Add Quotation</button
+    ><br />
+    <button class="button" type="button" onclick="goToSynch()">Odoo and Fusion Syching</button
+      ><br />
+  
+
+    <button class="button" type="button" onclick="onlogoutClicked()">Logout</button>
+    </div>
+    <div id="snackbar">Invalid Username or Password</div>
+    <br /><br />
+  </body>
+  <script>
+    function goToGetUpdateProperites() {
+      // location.href = "update_properties.html";
+      showToast("this feature is not implemented yet");
+    }
+
+    function goToGetPartNumber() {
+      location.href = "get_part_number.html";
+    }
+    function goToGenerateBoM() {
+      showToast("this feature is not implemented yet");
+    }
+    function goToAddQuotation() {
+      showToast("this feature it not implemented yet");
+    }
+    function goToSynch() {
+      
+      location.href = "synchparts.html";
+    }
+
+    function onlogoutClicked() {
+      var args = {
+        cmd: "LOGOUT",
+      };
+      console.log(args);
+      adsk.fusionSendData("send", JSON.stringify(args));
+    }
+
+    window.fusionJavaScriptHandler = {
+      handle: function (action, data) {
+        try {
+          if (action == "send") {
+            dataObj = JSON.parse(data);
+            if (dataObj.cmd == "LOGOUT") {
+              logout();
+            }
+          } else if (action == "debugger") {
+            debugger;
+          } else {
+            return "Unexpected command type: " + action;
+          }
+        } catch (e) {
+          console.log(e);
+          console.log(
+            "exception caught with command: " + action + ", data: " + data
+          );
+        }
+        return "OK";
+      },
+    };
+    function clearAllCategories() {
+      var catDdl = document.getElementById("catDdl");
+      // console.log(catDdl.options.length);
+      var lenght = catDdl.options.length;
+      for (var i = 1; i < lenght; i++) {
+        catDdl.remove(1);
+        // console.log(i);
+      }
+      // console.log(typeof(catDdl));
+    }
+    function addCategories(data) {
+      var catDdl = document.getElementById("catDdl");
+
+      for (var option of data) {
+        console.log(option);
+        var optionElement = document.createElement("OPTION");
+        optionElement.innerHTML = option.name;
+        optionElement.value = option.id;
+        catDdl.options.add(optionElement);
+      }
+    }
+    function logout() {
+      location.href = "login.html";
+    }
+
+    function showToast(msg) {
+      // Get the snackbar DIV
+      var x = document.getElementById("snackbar");
+      x.innerHTML = msg;
+      // Add the "show" class to DIV
+      x.className = "show";
+
+      // After 3 seconds, remove the show class from DIV
+      setTimeout(function () {
+        x.className = x.className.replace("show", "");
+      }, 3000);
+    }
+  </script>
+</html>

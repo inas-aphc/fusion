@@ -1,0 +1,3 @@
+1- Go To 
+%AppData%\Autodesk\Autodesk Fusion 360\API\AddIns\
+2- extract the Zip file 

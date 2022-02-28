@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src="https://code.jquery.com/jquery-3.6.0.js"
+        integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+    <title>Select Part Category </title>
+    <link rel="stylesheet" href="toast.css">
+</head>
+
+<body>
+    <img src="Resources\logo\aph_logo@033x.png" id="logo" height="100px"></img></br></br></br>
+    
+    <div id="infobox">
+    
+    Part Category :  
+        <select style="padding:10" id="catDdl" onchange="updateNamingUI()">
+            <option value="0"> Select Product Category</option>
+        </select>
+    </br>
+    
+        <button class="button" type='button' onclick='loadSubCats()'>Refresh SubCategories </button>
+    </br>
+        Part Subcategory :
+        <select id ="Subcat" onchange="updateNamingUI3()" >
+            <option>Select a Subcategory</option>
+        </select>
+                    
+    <div id="toReplace">
+        <ol id="fieldsList">
+        </ol>
+
+    </div>
+    <div id="buttonbox">
+    <button class="button" type='button' onclick='sendInfoToFusion()'>Generate Part Number </button>
+   <!-- <button class="button" type='button' onclick='rename()'>rename </button>-->
+    
+    <button class="button" type='button' onclick='goBack()'>Go Back </button>
+    </div>
+
+<div id="snackbar">Invalid Username or Password</div>
+<br /><br />
+</body>
+<script>
+   setTimeout(loadSubCats, 300);
+  
+    function updateNamingUI() { //category "hardware"
+        //   $("replace").load("./page.html");
+        var selectedcat = $("#catDdl").find(":selected").text();
+        //   console.log(selectedcat);
+        
+        $.get(selectedcat, function (html_str) {
+            if(selectedcat=="Hardware"){// console.log(html_str);
+                loadSubsubCats(); 
+           // $("#scheme").load("scheme.html");
+            }
+        });
+        //  console.log("UI Changed");
+    }
+    function updateNamingUI1() { //namingscheme value="Hardware.html"
+        //   $("replace").load("./page.html");
+        var selectedPage = $("#schemeD").find(":selected").val();
+        //   console.log(selectedPage);
+        //showToast(JSON.stringify(selectedPage));
+        $.get(selectedPage, function (html_str) {
+          
+            loadSubsubCats(); //automatic
+           // $("#replaceable").replaceWith(html_str); //hardset mode
+           
+        });
+        //  console.log("UI Changed");
+    }
+    function updateNamingUI2() { //subcategoris
+        //   $("replace").load("./page.html");
+        var selectedPage = $("#cmbNamingScheme").find(":selected").val();
+        //   console.log(selectedPage);
+        $.get(selectedPage, function (html_str) {
+            // console.log(html_str);
+            $("#toReplace").replaceWith(html_str);
+        });}
+       
+
+        function updateNamingUI3() { //subsubcategoris
+        //   $("replace").load("./page.html");
+        var selectedPage = $("#Subcat").find(":selected").text();
+        //   console.log(selectedPage);
+        var name= "Hardware/" + selectedPage + ".html";
+        //showToast(JSON.stringify(name));
+        $.get(name, function (html_str) {
+            // console.log(html_str);
+           // showToast(JSON.stringify(html_str));
+            $("#toReplace").replaceWith(html_str);
+        });
+        //  console.log("UI Changed");
+    }
+       //  console.log("UI Changed");
+    
+    function sendInfoToFusion() {
+        var catDdl = $("#Subcat").find(":selected").val(); //get part category
+        var listItems = $("#fieldsList li");          //get name as text
+        var partName = "";
+        var prefix= $("#prefix")
+        var partdisc = $("#disc").val() 
+        // console.log(listItems);
+        //showToast(JSON.stringify(listItems));
+        partName += (prefix.text())
+       
+        listItems.each(function (idx, li) {
+            elem = $(li).find("#field");
+            //showToast(JSON.stringify(elem.val()));  //get each Item named #feild 
+            var txtVal = elem.val();
+           
+            partName += ("-"+ txtVal);
+            // console.log(txtVal);
+            // and the rest of your code
+        });
+        if (catDdl.selectedIndex != 0) {
+            var args = {
+                cmd: "NPN",
+                catId: catDdl,
+                name: partName,
+                disc: partdisc
+            };
+           // console.log(args)
+           // showToast(JSON.stringify(partdisc));
+            adsk.fusionSendData('send', JSON.stringify(args));
+            
+        }
+       
+    }
+
+    function rename() {
+        var catDdl = $("#Subcat").find(":selected").val(); //get part category
+        var listItems = $("#fieldsList li");          //get name as text
+        var partName = "";
+        var prefix= $("#prefix")
+        var partdisc = $("#disc").val() 
+        // console.log(listItems);
+        //showToast(JSON.stringify(listItems));
+        partName += (prefix.text())
+       
+        listItems.each(function (idx, li) {
+            elem = $(li).find("#field");
+            //showToast(JSON.stringify(elem.val()));  //get each Item named #feild 
+            var txtVal = elem.val();
+           
+            partName += ("-"+ txtVal);
+            // console.log(txtVal);
+            // and the rest of your code
+        });
+        if (catDdl.selectedIndex != 0) {
+            var args = {
+                cmd: "RN",
+                catId: catDdl,
+                name: partName,
+                disc: partdisc
+            };
+           // console.log(args)
+           // showToast(JSON.stringify(partdisc));
+            adsk.fusionSendData('send', JSON.stringify(args));
+            
+        }
+       
+    }
+
+    function loadSubCats() {
+
+        var args = {
+            cmd: "LOAD_SUBCAT"
+        };
+        //showToast(JSON.stringify(args));
+        adsk.fusionSendData('send', JSON.stringify(args));
+    }
+    
+    function loadSubsubCats() {
+
+        var args = {
+            cmd: "LOAD_SUBsubCAT"
+        };
+        //showToast(JSON.stringify(args));
+        adsk.fusionSendData('send', JSON.stringify(args));
+            }
+
+
+    window.fusionJavaScriptHandler = {
+        handle: function (action, data) {
+            try {
+                if (action == 'send') {
+                    dataObj = JSON.parse(data);
+                   
+                    if (dataObj.cmd == "CATS") {
+                        clearAllCategories();
+                        addCategories(dataObj.data)
+                        //addsubCategories(dataObj.data)
+                        
+                    }
+                    if (dataObj.cmd == "SUBCATS") {
+                        clearAllCategories();
+                        addsubCategories(dataObj.data)
+                        
+                    }
+                    if (dataObj.cmd == "NPN") {
+                        if (dataObj.data == 'exists') {
+                            showToast('This component alrady has part number');
+                        }
+                        else {
+                            showToast('Part Number:' + dataObj.data + ' has been assigned to this component')
+                        }
+
+                    }if (dataObj.cmd == "RN") {
+                        if (dataObj.data == 'exists') {
+                            showToast('This component alrady has part number');
+                        }
+                        else {
+                            showToast('Part Number:' + dataObj.data + ' has been assigned to this component')
+                        }
+
+                    }RN
+                }
+                else if (action == 'debugger') {
+                    debugger;
+                }
+                else {
+                    return 'Unexpected command type: ' + action;
+                }
+            } catch (e) {
+                console.log(e);
+                console.log('exception caught with command: ' + action + ', data: ' + data);
+            }
+            return 'OK';
+        }
+    };
+
+    function clearAllCategories() {
+        var catDdl = document.getElementById('catDdl');
+        // console.log(catDdl.options.length);
+        var lenght = catDdl.options.length;
+        for (var i = 1; i < lenght; i++) {
+            catDdl.remove(1);
+            // console.log(i);
+        }
+        // console.log(typeof(catDdl));
+    }
+    function addCategories(data) {
+        var catDdl = document.getElementById('catDdl');
+        //showToast(JSON.stringify(data));
+        for (var option of data) {
+            console.log(option)
+            var optionElement = document.createElement("OPTION");
+            optionElement.innerHTML = option.name;
+            optionElement.value = option.id;
+            catDdl.options.add(optionElement);
+          
+    }
+        }
+        function addsubCategories(data) {
+        var catDdl = document.getElementById('Subcat');
+       // showToast(JSON.stringify(data));
+        for (var option of data) {
+            console.log(option)
+            var optionElement = document.createElement("OPTION");
+            optionElement.innerHTML = option.name;
+            optionElement.value = option.id;
+            catDdl.options.add(optionElement);
+          
+    }}
+
+    function showToast(msg) {
+        // Get the snackbar DIV
+        var x = document.getElementById("snackbar");
+        x.innerHTML = msg
+        // Add the "show" class to DIV
+        x.className = "show";
+        // After 3 seconds, remove the show class from DIV
+        setTimeout(function () { x.className = x.className.replace("show", ""); }, 3000);
+    }
+
+    function goBack() {
+        location.href = "Menu.html"
+    }
+
+
+</script>
+
+</html>

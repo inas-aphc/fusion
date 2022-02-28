@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src="https://code.jquery.com/jquery-3.6.0.js"
+        integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+    <title>Select Part Category </title>
+    <link rel="stylesheet" href="toast.css">
+</head>
+
+<body>
+    <img src="Resources\logo\aph_logo@033x.png" id="logo" height="100px"></img></br></br></br>
+    
+    <div id="infobox">   
+    <button class="button" type='button' onclick='loadinfo()'>Load Information</button>
+    <button class="button" type='button' onclick='goBack()'>Go Back </button>
+    </br>
+    <p id="p1">press load info</p>
+    <p id="p2"></p>
+    </div>
+    
+   
+<div id="snackbar">Invalid Username or Password</div>
+<br /><br />
+</body>
+<script>
+   
+   
+   
+    function sendInfoToFusion() {
+        var catDdl = document.getElementById('catDdl'); //get part category
+        var listItems = $("#fieldsList li");          //get name as text
+        var partName = "";
+        var prefix= $("#prefix")
+        // console.log(listItems);
+        //showToast(JSON.stringify(listItems));
+        partName += (prefix.text())
+        listItems.each(function (idx, li) {
+            elem = $(li).find("#field");
+            //showToast(JSON.stringify(elem.val()));  //get each Item named #feild 
+            var txtVal = elem.val();
+            if(txtVal !="undefined"){
+            partName += ("-"+ txtVal);}
+            // console.log(txtVal);
+            // and the rest of your code
+        });
+        if (catDdl.selectedIndex != 0) {
+            var args = {
+                cmd: "NPN",
+                catId: catDdl.value,
+                name: partName
+
+            };
+           // console.log(args)
+            adsk.fusionSendData('send', JSON.stringify(args));
+            
+        }
+        //showToast(partName);
+    }
+
+    function loadinfo() {
+
+        var args = {
+            cmd: "LOAD_INFO"
+        };
+        //showToast(JSON.stringify(args));
+        adsk.fusionSendData('send', JSON.stringify(args));
+       
+    }
+    function recreat(){
+        var args = {
+            cmd: "LOAD_RCT"
+        };
+        //showToast(JSON.stringify(args));
+        adsk.fusionSendData('send', JSON.stringify(args));
+
+    }
+
+    window.fusionJavaScriptHandler = {
+        handle: function (action, data) {
+            try {
+                if (action == 'send') {
+                    dataObj = JSON.parse(data);}
+                    if (dataObj.cmd == "INFO") {
+                        //showToast('This component alrady has part number');
+                        addinfo(dataObj.data);
+                        //showToast(JSON.stringify(dataObj.data));
+                    }if (dataObj.cmd == "RCT") {
+                        //showToast('This component alrady has part number');
+                        addinfo(dataObj.data);
+                        //showToast(JSON.stringify(dataObj.data));
+                    }
+                else if (action == 'debugger') {
+                    debugger;
+                }
+                else {
+                    return 'Unexpected command type: ' + action;
+                }
+            } catch (e) {
+                console.log(e);
+                console.log('exception caught with command: ' + action + ', data: ' + data);
+            }
+            return 'OK';
+        }
+    }
+
+
+
+    function addinfo(data) {
+        if(data[0]['id']){
+        var msg="current part name || Id || default Id: </br>"+ data[0]['name']+ " || " + data[0]['id'] +" || "+data[0]['default_code'];
+        document.getElementById("p1").innerHTML = msg;
+        document.getElementById("p2").innerHTML ='Part exists in The database!';
+        }
+        else{
+        showToast("no match found in oodo");
+        document.getElementById("p1").innerHTML = "this part is not on database. <button class='button' type='button' onclick='recreat()'>creat</button>";
+        //recreat();
+        }
+        
+        }    
+
+
+    function showToast(msg) {
+        // Get the snackbar DIV
+        var x = document.getElementById("snackbar");
+        x.innerHTML = msg;
+        // Add the "show" class to DIV
+        x.className = "show";
+        // After 3 seconds, remove the show class from DIV
+        setTimeout(function () { x.className = x.className.replace("show", ""); }, 3000);
+    }
+
+    function goBack() {
+        location.href = "Menu.html";
+    }
+
+
+</script>
+
+</html>

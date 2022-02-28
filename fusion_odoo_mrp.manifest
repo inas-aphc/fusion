@@ -1,0 +1,13 @@
+{
+	"autodeskProduct":	"Fusion360",
+	"type":	"addin",
+	"id":	"90ace70d-e647-46d7-9241-d972648e9bf2",
+	"author":	"sulaimanhabsi||inas",
+	"description":	{
+		"":	"This add-in allows the integration with odoo mrp and inventory modules "
+	},
+	"version":	"0.1",
+	"runOnStartup":	false,
+	"supportedOS":	"windows|mac",
+	"editEnabled":	true
+}
